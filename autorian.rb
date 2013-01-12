@@ -55,17 +55,28 @@ class AutoRian
     videos = []
     begin
       statement = @connection.createStatement
-      query = statement.executeQuery("select * from videos")
+      select = 'select * from videos'
       
+      unless params.nil?
+        select += ' where ' if params.length > 0
+        params.each_with_index { |(key, value), index| select += key.to_s + "=true" }
+        puts "HI GUISE"
+      end
+
+      query = statement.executeQuery(select)
       while query.next
         videos << query.getString(1)
+        #puts query.getString(19)
       end
+
+      puts select
     ensure
       statement.close
-      query.close
+      @connection.close
     end
 
     videos
+    "hello"
   end
 
   def select(params)
@@ -76,6 +87,6 @@ class AutoRian
   end
 end
 
-ar = AutoRian.new
-ar.connect
-ar.load_csv 'video_report_FullScreen_V_0.csv'
+#ar = AutoRian.new
+#ar.load_csv 'video_report_FullScreen_V_0.csv'
+#puts ar.videos_from_db nil
