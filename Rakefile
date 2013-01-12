@@ -3,6 +3,10 @@ require 'jdbc/sqlite3'
 require 'java'
 require './config.rb'
 
+task :bundle do
+  
+end
+
 task :setup_db do
   org.sqlite.JDBC
 

@@ -22,20 +22,21 @@ class AutoRian
           insert = 'insert into videos values ('
           row.each do |r|
             if r == 'Yes'
-              r = 'true'
+              r = 'true'.to_s
             elsif r == 'No'
-              r = 'false'
+              r = 'false'.to_s
             elsif r.nil?
-              r = "''"
+              r = '0'
             else
-              r = "'" + r + "'"
+              #r = "'" + r + "'"
             end
 
-            insert += r + ',' 
+            insert += "'" + r + "', " 
           end
-          insert = insert[0..-2]
+          insert = insert[0..-3]
           insert += ')'
           puts insert
+          puts 'help' if insert.nil?
           statement.executeUpdate(insert)
         ensure
           statement.close
