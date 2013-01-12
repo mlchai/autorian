@@ -15,8 +15,9 @@ class AutoRian
     csv = CSV.read(file)
     headers = csv.slice!(0)
 
-    csv.each do |row|
-      begin
+    
+    begin
+      csv.each do |row|
         statement = @connection.createStatement
         begin
           insert = 'insert into videos values ('
@@ -29,6 +30,7 @@ class AutoRian
               r = '0'
             else
               #r = "'" + r + "'"
+              r.gsub!(/'/, "")
             end
 
             insert += "'" + r + "', " 
@@ -41,11 +43,9 @@ class AutoRian
         ensure
           statement.close
         end
-      ensure
-        @connection.close
       end
-
-      #puts insert
+    ensure
+      @connection.close
     end
   end
 
