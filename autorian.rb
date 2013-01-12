@@ -2,11 +2,12 @@ require 'rubygems'
 require 'jdbc/sqlite3'
 require 'java'
 require 'csv'
+require './config.rb'
 
 class AutoRian
   def connect
     org.sqlite.JDBC
-    @connection = java.sql.DriverManager.getConnection 'jdbc:sqlite:db.db'
+    @connection = java.sql.DriverManager.getConnection 'jdbc:sqlite:' + RianConfig::DATABASE[:name]
   end
 
   def load_csv(file)
@@ -18,7 +19,7 @@ class AutoRian
       begin
         statement = @connection.createStatement
         begin
-          insert = 'insert into videos ('
+          insert = 'insert into videos values ('
           row.each do |r|
             if r == 'Yes'
               r = 'true'
@@ -30,10 +31,12 @@ class AutoRian
               r = "'" + r + "'"
             end
 
-            insert += r + ','
+            insert += r + ',' 
           end
+          insert = insert[0..-2]
           insert += ')'
-          #statement.executeUpdate(insert)
+          puts insert
+          statement.executeUpdate(insert)
         ensure
           statement.close
         end
@@ -41,7 +44,7 @@ class AutoRian
         @connection.close
       end
 
-      puts insert
+      #puts insert
     end
   end
 
