@@ -28,7 +28,6 @@ class AutoRian
             elsif r.nil?
               r = '0'
             else
-              #r = "'" + r + "'"
               r.gsub!(/'/, "")
             end
 
@@ -37,7 +36,6 @@ class AutoRian
           insert = insert[0..-3]
           insert += ')'
           puts insert
-          puts 'help' if insert.nil?
           statement.executeUpdate(insert)
         ensure
           statement.close
@@ -60,6 +58,14 @@ class AutoRian
     videos_from_db({claimed_by_this_owner: 'true', claimed_by_another_owner: 'false', status: 'Public', trueview_instream_enabled: 'false'})
   end
   
+  def batch4
+    
+  end
+  
+  def batch5
+    
+  end
+  
   def prebatch
     
   end
@@ -75,7 +81,6 @@ class AutoRian
       unless params.nil?
         select += ' where ' if params.length > 0
         params.each_with_index { |(key, value), index| select += key.to_s + '="' + value + '" AND ' }
-        puts "HI GUISE"
         select = select[0..-6] + ';'
         puts select
       end
@@ -83,7 +88,6 @@ class AutoRian
       query = statement.executeQuery(select)
       while query.next
         videos << query.getString(1)
-        #puts query.getString(19)
       end
 
     ensure
