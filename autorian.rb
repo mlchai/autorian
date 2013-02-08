@@ -47,6 +47,22 @@ class AutoRian
       @connection.close
     end
   end
+  
+  def batch1
+    videos_from_db({claimed_by_this_owner: 'true', claimed_by_another_owner: 'false', status: 'Public', afv_overlay_enabled: 'false'})
+  end
+  
+  def batch2
+    videos_from_db({claimed_by_this_owner: 'true', claimed_by_another_owner: 'false', status: 'Public', instream_ads_enabled: 'false'})
+  end
+  
+  def batch3
+    videos_from_db({claimed_by_this_owner: 'true', claimed_by_another_owner: 'false', status: 'Public', trueview_instream_enabled: 'false'})
+  end
+  
+  def prebatch
+    
+  end
 
   def videos_from_db(params)
     connect
@@ -58,24 +74,25 @@ class AutoRian
       
       unless params.nil?
         select += ' where ' if params.length > 0
-        params.each_with_index { |(key, value), index| select += key.to_s + '="true"' }
+        params.each_with_index { |(key, value), index| select += key.to_s + '="' + value + '" AND ' }
         puts "HI GUISE"
+        select = select[0..-6] + ';'
+        puts select
       end
-      select += ';'
+
       query = statement.executeQuery(select)
       while query.next
         videos << query.getString(1)
-        puts query.getString(19)
+        #puts query.getString(19)
       end
 
-      puts select
     ensure
       statement.close
       @connection.close
     end
 
+    puts videos
     videos
-    puts "hello"
   end
 
   def select(params)

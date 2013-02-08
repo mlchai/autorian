@@ -7,7 +7,3 @@ class RianConfig
 
   DATABASE = {name: 'autorian.db', user: '', password: ''}
 end
-
-puts RianConfig::HEADERS.split(',').length == RianConfig::DATA_TYPES.split(',').length
-puts RianConfig::HEADERS.split(',').length
-puts RianConfig::DATA_TYPES.split(',').length
