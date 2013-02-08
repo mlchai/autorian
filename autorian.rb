@@ -15,7 +15,6 @@ class AutoRian
     csv = CSV.read(file)
     headers = csv.slice!(0)
 
-    
     begin
       csv.each do |row|
         statement = @connection.createStatement
@@ -59,14 +58,14 @@ class AutoRian
       
       unless params.nil?
         select += ' where ' if params.length > 0
-        params.each_with_index { |(key, value), index| select += key.to_s + "=true" }
+        params.each_with_index { |(key, value), index| select += key.to_s + '="true"' }
         puts "HI GUISE"
       end
-
+      select += ';'
       query = statement.executeQuery(select)
       while query.next
         videos << query.getString(1)
-        #puts query.getString(19)
+        puts query.getString(19)
       end
 
       puts select
@@ -76,7 +75,7 @@ class AutoRian
     end
 
     videos
-    "hello"
+    puts "hello"
   end
 
   def select(params)
@@ -86,7 +85,3 @@ class AutoRian
     query + ';'
   end
 end
-
-#ar = AutoRian.new
-#ar.load_csv 'video_report_FullScreen_V_0.csv'
-#puts ar.videos_from_db nil
