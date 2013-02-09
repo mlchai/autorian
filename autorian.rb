@@ -5,9 +5,49 @@ require 'csv'
 require './config.rb'
 
 class AutoRian
+  POS = 'Yes'
+  NEG = 'No'
+  
   def connect
     org.sqlite.JDBC
     @connection = java.sql.DriverManager.getConnection 'jdbc:sqlite:' + RianConfig::DATABASE[:name]
+  end
+  
+  def setup_db
+    connect
+    
+    query = 'create table videos ('
+    headers = RianConfig::HEADERS.split(',')
+    types = RianConfig::DATA_TYPES.split(',')
+    (0..headers.length - 1).each do |i|
+      query += headers[i] + ' ' + types[i]
+      query += ', ' unless i == headers.length - 1
+    end
+
+    query += ');'
+
+    puts query
+    begin
+      statement = @connection.createStatement
+      statement.executeUpdate(query)
+    ensure
+      statement.close
+      @connection.close
+    end
+  end
+  
+  def wipe_db
+    connect
+    
+    query = 'drop table videos;'
+  
+    begin
+      statement = @connection.createStatement
+      statement.executeUpdate(query)
+    ensure
+      statement.close
+      @connection.close
+    end
   end
 
   def load_csv(file)
@@ -21,12 +61,8 @@ class AutoRian
         begin
           insert = 'insert into videos values ('
           row.each do |r|
-            if r == 'Yes'
-              r = 'true'.to_s
-            elsif r == 'No'
-              r = 'false'.to_s
-            elsif r.nil?
-              r = '0'
+            if r.nil?
+              r = ''
             else
               r.gsub!(/'/, "")
             end
@@ -47,23 +83,23 @@ class AutoRian
   end
   
   def batch1
-    videos_from_db({claimed_by_this_owner: 'true', claimed_by_another_owner: 'false', status: 'Public', afv_overlay_enabled: 'false'})
+    videos_from_db({claimed_by_this_owner: POS, claimed_by_another_owner: NEG, status: 'Public', afv_overlay_enabled: NEG})
   end
   
   def batch2
-    videos_from_db({claimed_by_this_owner: 'true', claimed_by_another_owner: 'false', status: 'Public', instream_ads_enabled: 'false'})
+    videos_from_db({claimed_by_this_owner: POS, claimed_by_another_owner: NEG, status: 'Public', instream_ads_enabled: NEG})
   end
   
   def batch3
-    videos_from_db({claimed_by_this_owner: 'true', claimed_by_another_owner: 'false', status: 'Public', trueview_instream_enabled: 'false'})
+    videos_from_db({claimed_by_this_owner: POS, claimed_by_another_owner: NEG, status: 'Public', trueview_instream_enabled: NEG})
   end
   
   def batch4
-    
+    #videos_from_db({claimed_by_this_owner: POS, claimed_by_another_owner: NEG, status: 'Public', })
   end
   
   def batch5
-    
+    #videos_from_db({claimed_by_this_owner: POS, claimed_by_another_owner: NEG, status: 'Public', })
   end
   
   def prebatch
@@ -76,14 +112,7 @@ class AutoRian
     videos = []
     begin
       statement = @connection.createStatement
-      select = 'select * from videos'
-      
-      unless params.nil?
-        select += ' where ' if params.length > 0
-        params.each_with_index { |(key, value), index| select += key.to_s + '="' + value + '" AND ' }
-        select = select[0..-6] + ';'
-        puts select
-      end
+      select = select params
 
       query = statement.executeQuery(select)
       while query.next
@@ -100,9 +129,14 @@ class AutoRian
   end
 
   def select(params)
-    query = 'select * from videos where'
-    params.each_with_index { |(key, value), index| query += ' ' + key + "='" + value + "'" }
-
-    query + ';'
+    select = 'select * from videos'
+      
+    unless params.nil?
+      select += ' where ' if params.length > 0
+      params.each_with_index { |(key, value), index| select += key.to_s + '="' + value + '" AND ' }
+      select = select[0..-6] + ';'
+    end
+    
+    select
   end
 end

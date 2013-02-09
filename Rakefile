@@ -10,27 +10,8 @@ task :bundle do
 end
 
 task :setup_db do
-  org.sqlite.JDBC
-
-  connection = java.sql.DriverManager.getConnection 'jdbc:sqlite:' + RianConfig::DATABASE[:name]
-  query = 'create table videos ('
-  headers = RianConfig::HEADERS.split(',')
-  types = RianConfig::DATA_TYPES.split(',')
-  (0..headers.length - 1).each do |i|
-    query += headers[i] + ' ' + types[i]
-    query += ', ' unless i == headers.length - 1
-  end
-
-  query += ');'
-
-  puts query
-  begin
-    statement = connection.createStatement
-    statement.executeUpdate(query)
-  ensure
-    statement.close
-    connection.close
-  end
+  ar = AutoRian.new
+  ar.setup_db
 end
 
 task :load_csv do
@@ -39,18 +20,8 @@ task :load_csv do
 end
 
 task :wipe_db do
-  org.sqlite.JDBC
-
-  connection = java.sql.DriverManager.getConnection 'jdbc:sqlite:' + RianConfig::DATABASE[:name]
-  query = 'drop table videos;'
-  
-  begin
-    statement = connection.createStatement
-    statement.executeUpdate(query)
-  ensure
-    statement.close
-    connection.close
-  end
+  ar = AutoRian.new
+  ar.wipe_db
   
   puts 'Videos cleared!'
 end
