@@ -2,9 +2,9 @@ require 'rawr'
 require 'rubygems'
 require 'jdbc/sqlite3'
 require 'java'
-require './config.rb'
+require './src/config.rb'
 
-require 'autorian'
+require './src/autorian.rb'
 
 task :bundle do
   
