@@ -1,3 +1,4 @@
+require 'rawr'
 require 'rubygems'
 require 'jdbc/sqlite3'
 require 'java'

@@ -1,4 +1,4 @@
-require './autorian.rb'
+require './src/autorian.rb'
 
 ar = AutoRian.new
 
