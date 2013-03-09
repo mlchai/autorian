@@ -1,0 +1,12 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    dbd-jdbc (0.1.4)
+    jdbc-sqlite3 (3.7.2)
+
+PLATFORMS
+  java
+
+DEPENDENCIES
+  dbd-jdbc (= 0.1.4)
+  jdbc-sqlite3 (= 3.7.2)

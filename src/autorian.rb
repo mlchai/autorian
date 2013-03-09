@@ -3,13 +3,16 @@ require 'jdbc/sqlite3'
 require 'java'
 require 'csv'
 require './src/config.rb'
+require 'bundler/setup'
 
 class AutoRian
   POS = 'Yes'
   NEG = 'No'
   
   def connect
+    Bundler.require
     org.sqlite.JDBC
+    java.sql.DriverManager.registerDriver Java::JavaClass.for_name("org.sqlite.JDBC")
     @connection = java.sql.DriverManager.getConnection 'jdbc:sqlite:db/' + RianConfig::DATABASE[:name]
   end
   
