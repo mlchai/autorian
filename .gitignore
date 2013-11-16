@@ -8,3 +8,6 @@
 src/org
 package
 lib
+bundler
+*.swp
+splitter2.rb

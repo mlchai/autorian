@@ -3,14 +3,13 @@ require 'jdbc/sqlite3'
 require 'java'
 require 'csv'
 require './src/config.rb'
-require 'bundler/setup'
+require 'pry'
 
 class AutoRian
   POS = 'Yes'
   NEG = 'No'
   
   def connect
-    Bundler.require
     org.sqlite.JDBC
     java.sql.DriverManager.registerDriver Java::JavaClass.for_name("org.sqlite.JDBC")
     @connection = java.sql.DriverManager.getConnection 'jdbc:sqlite:db/' + RianConfig::DATABASE[:name]
@@ -55,6 +54,7 @@ class AutoRian
 
   def load_csv(file)
     connect
+
     csv = CSV.read(file)
     headers = csv.slice!(0)
 
@@ -83,43 +83,23 @@ class AutoRian
     ensure
       @connection.close
     end
-  end
-  
-  def batch1
-    videos_from_db({claimed_by_this_owner: POS, claimed_by_another_owner: NEG, status: 'Public', afv_overlay_enabled: NEG})
-  end
-  
-  def batch2
-    videos_from_db({claimed_by_this_owner: POS, claimed_by_another_owner: NEG, status: 'Public', instream_ads_enabled: NEG})
-  end
-  
-  def batch3
-    videos_from_db({claimed_by_this_owner: POS, claimed_by_another_owner: NEG, status: 'Public', trueview_instream_enabled: NEG})
-  end
-  
-  def batch4
-    #videos_from_db({claimed_by_this_owner: POS, claimed_by_another_owner: NEG, status: 'Public', })
-  end
-  
-  def batch5
-    #videos_from_db({claimed_by_this_owner: POS, claimed_by_another_owner: NEG, status: 'Public', })
-  end
-  
-  def prebatch
-    
-  end
+  end 
 
-  def videos_from_db(params)
+  def videos_from_db(params, exclude, headers)
     connect
 
     videos = []
     begin
       statement = @connection.createStatement
-      select = select params
+      select = select params, exclude.split(','), headers
 
       query = statement.executeQuery(select)
+      
       while query.next
-        videos << query.getString(1)
+        #binding.pry
+        row = ''
+        headers.split(',').each { |header| row += "'#{query.getString(header)}',"  }
+        videos << row
       end
 
     ensure
@@ -131,12 +111,20 @@ class AutoRian
     videos
   end
 
-  def select(params)
-    select = 'select * from videos'
-      
+  def select(params, exclude=nil, headers=nil)
+    columns = headers || '*'
+
+    select = "select #{columns} from videos"
+    
     unless params.nil?
       select += ' where ' if params.length > 0
       params.each_with_index { |(key, value), index| select += key.to_s + '="' + value + '" AND ' }
+      if exclude
+        #select
+        exclude.each { |username| select += "username != '#{username}' AND " }
+        
+      end
+      
       select = select[0..-6] + ';'
     end
     
