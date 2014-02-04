@@ -13,3 +13,7 @@ file.csv is the csv file
 'video_id,username' is a list of columns to return
 
 all paramters after that follow a specific pattern: column value, so status Public claimed_by_owner false would be status='Public' AND claimed_by_owner=false in the query.
+
+## How to Build
+
+autorian is built using rawr to create its jar file.

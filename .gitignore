@@ -11,3 +11,5 @@ lib
 bundler
 *.swp
 splitter2.rb
+*.class
+.*rvmrc*

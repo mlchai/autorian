@@ -1,6 +1,5 @@
 require 'rubygems'
-require 'jdbc/sqlite3'
-require 'java'
+require 'sqlite3'
 require 'csv'
 require './src/config.rb'
 require 'pry'
@@ -10,9 +9,7 @@ class AutoRian
   NEG = 'No'
   
   def connect
-    org.sqlite.JDBC
-    java.sql.DriverManager.registerDriver Java::JavaClass.for_name("org.sqlite.JDBC")
-    @connection = java.sql.DriverManager.getConnection 'jdbc:sqlite:db/' + RianConfig::DATABASE[:name]
+    @connection = SQLite3::Database.new "db/#{RianConfig::DATABASE[:name]}"
   end
   
   def setup_db
@@ -29,13 +26,8 @@ class AutoRian
     query += ');'
 
     puts query
-    begin
-      statement = @connection.createStatement
-      statement.executeUpdate(query)
-    ensure
-      statement.close
-      @connection.close
-    end
+    
+    @connection.execute query
   end
   
   def wipe_db
@@ -43,13 +35,7 @@ class AutoRian
     
     query = 'drop table videos;'
   
-    begin
-      statement = @connection.createStatement
-      statement.executeUpdate(query)
-    ensure
-      statement.close
-      @connection.close
-    end
+    @connection.execute query
   end
 
   def load_csv(file)
@@ -58,30 +44,22 @@ class AutoRian
     csv = CSV.read(file)
     headers = csv.slice!(0)
 
-    begin
-      csv.each do |row|
-        statement = @connection.createStatement
-        begin
-          insert = 'insert into videos values ('
-          row.each do |r|
-            if r.nil?
-              r = ''
-            else
-              r.gsub!(/'/, "")
-            end
-
-            insert += "'" + r + "', " 
-          end
-          insert = insert[0..-3]
-          insert += ')'
-          puts insert
-          statement.executeUpdate(insert)
-        ensure
-          statement.close
+    csv.each do |row|
+      insert = 'insert into videos values ('
+      row.each do |r|
+        if r.nil?
+          r = ''
+        else
+          r.gsub!(/'/, "")
         end
+
+        insert += "'" + r + "', " 
       end
-    ensure
-      @connection.close
+      insert = insert[0..-3]
+      insert += ')'
+      puts insert
+      
+      @connection.execute(insert)
     end
   end 
 
@@ -89,22 +67,12 @@ class AutoRian
     connect
 
     videos = []
-    begin
-      statement = @connection.createStatement
-      select = select params, exclude.split(','), headers
+    select = select params, exclude.split(','), headers
+    
+    puts select
 
-      query = statement.executeQuery(select)
-      
-      while query.next
-        #binding.pry
-        row = ''
-        headers.split(',').each { |header| row += "'#{query.getString(header)}',"  }
-        videos << row
-      end
-
-    ensure
-      statement.close
-      @connection.close
+    @connection.execute(select) do |row|
+      videos << row
     end
 
     puts videos

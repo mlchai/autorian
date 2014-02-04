@@ -13,17 +13,23 @@ if ARGV[0]
     i = i + 2
   end
 
-
   ar.wipe_db
   ar.setup_db
   ar.load_csv ARGV[0]
 
+  filename="batch-#{Time.now}.txt"
   output = ''
   arr = ar.videos_from_db(params, ARGV[1], ARGV[2])
-  arr.each { |i| output += i + "\n" }
-  f = File.new('batch.txt', 'w')
-  f.write(output)
+  puts 'Preparing output...'
+  #arr.each { |i| output += i + "\n" }
+  f = File.new(filename, 'a')
+  puts "Writing to #{filename}..."
+  arr.each do |i|
+    f.write("#{i}\n")
+  end
   f.close
+
+  puts 'Done!'
 else
   puts 'Need a file to parse!'
 end
