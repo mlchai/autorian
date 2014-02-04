@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'sqlite3'
 require 'csv'
 require './src/config.rb'
@@ -72,7 +71,7 @@ class AutoRian
     puts select
 
     @connection.execute(select) do |row|
-      videos << row
+      videos << row.join("\t")
     end
 
     puts videos
